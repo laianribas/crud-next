@@ -29,10 +29,14 @@ export default function Table(props: TableProps) {
       return (
         <tr key={cliente.id}
           className={`${i % 2 === 0 ? 'bg-purple-200' : 'bg-purple-100'}`}>
-          <td className="text-left p-4">{cliente.id}</td>
-          <td className="text-left p-4">{cliente.nome}</td>
-          <td className="text-left p-4">{cliente.idade}</td>
-          {exibirAcoes ? actionRender(cliente) : false}
+          {cliente.nome ?
+            <>
+              <td className="text-left p-4">{cliente.id}</td>
+              <td className="text-left p-4">{cliente.nome}</td>
+              <td className="text-left p-4">{cliente.idade}</td>
+              {exibirAcoes ? actionRender(cliente) : false}
+            </>
+            : false}
         </tr>
       )
     })
@@ -42,7 +46,6 @@ export default function Table(props: TableProps) {
     return (
       <td className="flex justify-center">
         {props.clienteSelecionado ? (
-
           <button className={`flex justify-center items-center text-green-600 rounded-full hover:bg-purple-50 p-2 m-1`}
             onClick={() => props.clienteSelecionado?.(cliente)}
           >{IconEdit}</button>
