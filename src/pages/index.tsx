@@ -3,7 +3,8 @@ import Button from '../components/Button'
 import Form from '../components/Form'
 import Layout from '../components/Layout'
 import Table from '../components/Table'
-
+import { db } from '../backend/firebase-config'
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore'
 import Cliente from '../core/Cliente'
 import Repo_cliente from '../core/Repo_cliente'
 
@@ -12,20 +13,33 @@ export default function Home() {
   const [cliente, setCliente] = useState<Cliente>(Cliente.vazio())
   const [clientes, setClientes] = useState<Cliente[]>([Cliente.vazio()])
   const [visible, setVisible] = useState(true)
+  const clienteCollectionRef = collection(db, 'clientes')
 
+  useEffect(() => {
+    const getCliente = async () => {
+      const data = await getDocs(clienteCollectionRef)
+      setClientes(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
+    }
+    getCliente()
+  }, [])
 
-  function clienteSelecionado(cliente: Cliente) {
+  async function clienteSelecionado(cliente: Cliente) {
+
+    const clienteDoc = doc(db, "clientes", cliente.id)
+    await updateDoc(clienteDoc, { id: cliente.id, idade: Number(cliente.idade), nome: cliente.nome })
     setCliente(cliente)
     setVisible(false)
-    console.log(cliente.nome)
   }
-  function clienteExcluido(cliente: Cliente) {
-    console.log(cliente.nome)
+  async function clienteExcluido(cliente: Cliente) {
+    const clienteDoc = doc(db, 'clientes', cliente.id)
+    await deleteDoc(clienteDoc)
+    location.reload();
   }
 
-  function salvarCliente(cliente: Cliente) {
-    console.log(cliente)
+  async function salvarCliente(cliente: Cliente) {
+    await addDoc(clienteCollectionRef, { nome: cliente.nome, idade: cliente.idade })
     setVisible(true)
+    location.reload();
   }
 
   function novoCliente() {
